@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
       if(err) {
         res.status(401).json({ you: 'shall not pass!' });
       } else {
-        
+        //why would we give the decoded token? req.decodedToken = decodedToken
         next()
       }
     })
