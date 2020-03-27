@@ -33,7 +33,7 @@ router.post('/login', (req, res) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, options)
       res.json({token})
     } else {
-      res.status(401).json("you shall not pass")
+      res.status(401).json({ you: "shall not pass!" })
     }
     
   })

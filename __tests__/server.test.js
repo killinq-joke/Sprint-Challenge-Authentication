@@ -30,7 +30,7 @@ describe("auth-router.js",  () => {
         it("returns you shall not pass w/out right credentials", () => {
             return request(server).post("/api/auth/login")
             .send({username: "bropaz", password: "zaiojxezf"})
-            .expect("you shall not pass")
+            .expect({ you: "shall not pass!" })
         })
     })
     
