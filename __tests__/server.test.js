@@ -8,24 +8,26 @@ beforeAll(async () => {
 
 describe("auth-router.js", () => {
   describe("[POST] /api/auth/register", () => {
-    it("posts successfully", () => {
-      return request(server)
+    it("posts successfully a user", async () => {
+      expect(await db("users")).toHaveLength(0);
+      await request(server)
         .post("/api/auth/register")
         .send({ username: "salut", password: "habib" })
-        .expect(201);
+        .then(async (res) => {
+          expect(res.status).toBe(201);
+          expect(await db("users")).toHaveLength(1);
+        });
     });
   });
 
   describe("[POST] /api/auth/login", () => {
-    it("logs in w/ right credentials", () => {
-      return request(server)
-        .post("/api/auth/register")
-        .send({ username: "zak", password: "akk" })
-        .then(() => {
-          return request(server)
-            .post("/api/auth/login")
-            .send({ username: "zak", password: "akk" })
-            .expect(200);
+    it("gives token back w/ right credentials", async () => {
+      await request(server)
+        .post("/api/auth/login")
+        .send({ username: "salut", password: "habib" })
+        .then((res) => {
+          expect(res.status).toBe(200);
+          expect(res.body.token).toBeDefined();
         });
     });
 
@@ -47,19 +49,32 @@ describe("auth-router.js", () => {
 describe("jokes-router.js", () => {
   describe("[GET] /api/jokes", () => {
     it("returns a 401 w/out right auth", () => {
-      return request(server)
-        .get("/api/jokes")
-        .expect(401);
+      return request(server).get("/api/jokes").expect(401);
     });
     it("returns 'you shall not pass' w/out right auth", () => {
       return request(server)
         .get("/api/jokes")
         .expect({ you: "shall not pass!" });
     });
-    // it("gets all jokes with authorization", () => {
-    //     return request(server).get("/api/jokes")
-    //     .set('Authorization', token)
-    //     .expect(200)
-    // })
+    it("gets all jokes with authorization", async () => {
+      await request(server)
+        .post("/api/auth/login")
+        .send({ username: "salut", password: "habib" })
+        .then((res) => {
+          return request(server)
+            .get("/api/jokes")
+            .set("Authorization", res.body.token)
+            .then((res) => {
+              const expected = [
+                {
+                  id: "0DQKB51oGlb",
+                  joke:
+                    "What did one nut say as he chased another nut?  I'm a cashew!",
+                },
+              ];
+              expect(res.body).toEqual(expect.arrayContaining(expected));
+            });
+        });
+    });
   });
 });
