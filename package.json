@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon index.js",
-    "test": "env DB_ENV=testing jest --watchAll"
+    "test": "env DB_ENV=testing JWT_SECRET=secret jest --watch"
   },
   "repository": {
     "type": "git",

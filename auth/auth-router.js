@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bc = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const userMD = require("../models/userModel")
+const secret = require("../api/secret")
 
 router.post('/register', (req, res) => {
   // implement registration
@@ -30,8 +31,8 @@ router.post('/login', (req, res) => {
       const options = {
         expiresIn: 300
       }
-      const token = jwt.sign(payload, process.env.JWT_SECRET, options)
-      res.json({token})
+      const token = jwt.sign(payload, secret, options);
+      res.status(200).json({token})
     } else {
       res.status(401).json({ you: "shall not pass!" })
     }

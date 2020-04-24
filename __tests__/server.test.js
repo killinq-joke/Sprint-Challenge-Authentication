@@ -8,25 +8,29 @@ beforeAll(async () => {
 
 describe("auth-router.js", () => {
   describe("[POST] /api/auth/register", () => {
-    it("posts successfully", () => {
-      return request(server)
+    it("posts successfully a user", async () => {
+      expect(await db("users")).toHaveLength(0);
+      await request(server)
         .post("/api/auth/register")
         .send({ username: "salut", password: "habib" })
-        .expect(201);
+        .then(async res => {
+          expect(res.status).toBe(201)
+          expect(await db("users")).toHaveLength(1);
+        })
     });
   });
 
   describe("[POST] /api/auth/login", () => {
-    it("logs in w/ right credentials", () => {
-      return request(server)
-        .post("/api/auth/register")
-        .send({ username: "zak", password: "akk" })
-        .then(() => {
-          return request(server)
+    it("logs in w/ right credentials", async () => {
+        
+          await request(server)
             .post("/api/auth/login")
-            .send({ username: "zak", password: "akk" })
-            .expect(200);
-        });
+            .send({ username: "salut", password: "habib" })
+            .then((res) => {
+              expect(res.status).toBe(200);
+            });
+            
+        
     });
 
     it("returns 401 w/out right credentials", () => {
